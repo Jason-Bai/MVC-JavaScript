@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>JavaScript MVC</title>
+</head>
+<body>
+    <div id="event" style="width: 100px;height: 100px;border:1px solid #ccc;">
+        This is a test!
+    </div>
+    <input type="text" id="demo"/>
+    <script>
+        var Class = function (parent) {
+
+            var klass = function () {
+                this.init.call(this, argument);
+            };            
+
+            klass.prototype.init = function () {};
+
+            if(parent) {
+                var subclass = function () {};
+                subclass.prototype = parent.prototype;
+                klass.prototype = new subclass();               
+            }
+
+            klass.fn = klass.prototype;
+            klass._super = klass.__proto__;
+
+            // add fields and methods into Class
+            klass.extend = function (obj) {
+                var extended = obj.extended;
+                for(var i in obj) {
+                    klass[i] = obj[i];
+                }
+                if(extended) {
+                    extended(klass);
+                }
+            };
+
+            // add fields and methods into prototype
+            klass.include = function (obj) {
+                var included = obj.included;
+                for(var i in obj) {
+                    klass.fn[i] = obj[i];
+                }
+                if(included) {
+                    included(klass);
+                }
+            };
+
+            var proxy = function (fn, thisObject) {
+                return (function () {
+                    fn.call(thisObject, arguments);
+                });
+            }
+
+            klass.proxy = klass.fn.proxy = proxy;
+
+            return klass;
+
+        };
+    </script>
+</body>
+</html>

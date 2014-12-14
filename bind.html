@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>JavaScript MVC</title>
+    <script src="js/lib/jquery/dist/jquery.js"></script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+        #tabs {
+            list-style: none;
+        }
+        #tabs li {
+            display: inline-block;
+        }
+        #tabs li.active {
+            border: 1px solid #ccc;
+            background: #eee;
+        }
+        #tabContent div {
+            display: none;
+            z-index: 1;
+        }
+        #tabContent div.active {
+            display: block;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <ul id="tabs">
+        <li data-tab="users">Users</li>
+        <li data-tab="groups">Groups</li>
+    </ul>
+    <div id="tabContent">
+        <div data-tab="users">Users Content</div>
+        <div data-tab="groups">Groups Content</div>
+    </div>
+    <script>
+    $(function () {
+
+        (function (jQuery) {
+            jQuery.fn.tabs = function (control) {
+                var element = $(this),
+                    control = $(control);
+
+                element.delegate('li', 'click', function () {
+                    var tabName = $(this).attr('data-tab');
+                    element.trigger('change.tabs', tabName);
+                });
+
+                element.bind('change.tabs', function (e, tabName) {
+                    element.find('li').removeClass('active');
+                    element.find("li[data-tab='" + tabName + "']").addClass('active');
+                });
+
+                element.bind('change.tabs', function (e, tabName) {
+                    control.find('div[data-tab]').removeClass('active');
+                    control.find("div[data-tab='" + tabName + "']").addClass('active');
+                });
+
+                var firstName = element.find('li:first').attr('data-tab');
+                element.trigger('change.tabs', firstName);
+            };
+        } ($));        
+        
+        $('#tabs').tabs('#tabContent');
+
+    });
+    </script>
+</body>
+</html>

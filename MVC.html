@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>MVC for JavaScript</title>
+	<script src="js/lib/jquery/jquery.js"></script>
+	<script src="js/mvc.js"></script>
+</head>
+<body>
+	<script>
+	var Assert = Model.create();
+	//console.log(user);
+	var asset = Assert.init();
+	asset.name = 'same, same';
+	asset.save();
+
+	asset.destory();
+	console.log(asset);
+	</script>
+</body>
+</html>
