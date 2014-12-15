@@ -9,13 +9,15 @@
 <body>
 	<script>
 	var Assert = Model.create();
-	//console.log(user);
-	var asset = Assert.init();
-	asset.name = 'same, same';
-	asset.save();
+	Assert.attributes = ['name', 'ext'];
 
-	asset.destory();
-	console.log(asset);
+	var asset = Assert.init({name: 'document', ext: '.txt'});
+	asset.save();
+	var asset1 = Assert.init({name: 'file', ext: '.txt'});
+	asset1.save();
+	
+	Assert.saveLocal('assert');
+	console.log(localStorage['assert']);
 	</script>
 </body>
 </html>

@@ -4,7 +4,7 @@
  * @author jason
  */
  (function (w) {
-
+ 	/******************************** Model Start ***********************************/
  	if(typeof Object.create !== 'function') {
  		Object.creat = function  (o) {
  			function F() {}
@@ -25,18 +25,22 @@
  			
  		},
  		created: function  () { // 创建类之后的处理
+ 			// 数据池
  			this.records = [];
+ 			// 序列化属性
+ 			this.attribues = [];
  		},
  		prototype: {
  			init: function  (attrs) { // 新实例创建后执行的代码
  				if(attrs) {
- 					this.load(attrs);
+ 					this.load(attrs[0] || {});
  				}
  			},
  			load: function (attributes) {
  				for(var name in attributes) {
  					this[name] = attributes[name];
  				}
+
  			}
  		},
  		create: function () { // 创建该类的子类
@@ -89,6 +93,32 @@
  		},
  		dup: function () {
  			return jQuery.extend(true, {}, this);
+ 		},
+ 		attributes: function  () {
+ 			// 返回的指定的attributes
+ 			var result = {};
+ 			for(var i in this.parent.attributes) {
+ 				var attr = this.parent.attributes[i];
+ 				result[attr] = this[attr];
+ 			}
+ 			result.id = this.id;
+ 			return result;
+ 		},
+ 		// 添加该条记录到数据库中
+ 		createRemote: function  (url, callback) {
+ 			$.post(url, this.attributes(), callback);
+ 		},
+ 		// 更新该条记录到数据库中
+ 		updateRemote: function  (url, callback) {
+ 			var that = this;
+ 			$.ajax({
+ 				url: url,
+ 				data: this.attributes(),
+ 				success: function (r) {
+ 					callback(r);
+ 				},
+ 				type: 'PUT'
+ 			});
  		}
  	});
 
@@ -97,8 +127,47 @@
  			var record = this.records[id];
  			if(!record) new Error('Unknown record');
  			return record.dup();
- 		}
+ 		},
+ 		toJSON: function () {
+ 			var r = [],
+ 				obj = null;
+ 			for(var i in this.records) {
+ 				obj = this.records[i].attributes();
+ 				r.push(JSON.stringify(obj));
+ 			}
+ 			return r;
+ 		},
+ 		parse: function (arr) {
+ 			var r = [],
+ 				json = null;
+ 			for(var i  = 0, max = arr.length; i < max; i++) {
+ 				r.push(JSON.parse(arr[i]));
+ 			}
+ 			return r;
+ 		},
+ 		saveLocal: function  (name) {
+ 			// 使用;作为分割将数据存储在localStorage
+			localStorage[name] = this.toJSON().join(';');
+		},
+		loadLocal: function (name) {
+			// 将存储在localStorage中的数据load到数据池中
+			var data = localStorage[name];
+			this.populate(this.parse(data.split(';')));
+		},
+		batchCreateRemote: function (url, callback, fn) {
+			for(var i in this.records) {
+				this.records[i].createRemote(url, callback);
+			}
+			fn && fn();
+		},
+		batchUpdateRemote: function  (url, callback, fn) {
+			for(var i in this.records) {
+				this.records[i].updateRemote(url, callback);
+			}
+			fn && fn();
+		}
  	});
 
  	w.Model = Model;
+ 	/******************************** Model End ***********************************/
  }(window))
