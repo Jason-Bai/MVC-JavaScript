@@ -5,9 +5,56 @@
 	<title>MVC for JavaScript</title>
 	<script src="js/lib/jquery/jquery.js"></script>
 	<script src="js/mvc.js"></script>
+	<style>
+	.over {
+		border:1px solid #f00;
+	}
+	#view {
+		height:100px;
+		width: 100px;
+		background-color:#ccc;
+		display:inline-block;
+	}
+	.input-prompt, .input-warnning, .input-success {
+		display:none;
+		border:1px solid #ccc;
+	}
+
+	</style>
 </head>
 <body>
+	<!--
+	<div id="view">
+		This is a demo!
+	</div>
+	<form id="form" action="#" method="POST">
+		<input type="search" placeholder='搜索'>
+		<button type="submit">搜索</button>
+	</form>
+	-->
+	<form id="login" action="#" method="POST">
+		<fieldset>
+			<legend>
+				登录
+			</legend>
+			<p>
+				<label for="email"></label>
+				<input type="text" name="email">
+				<span class="input-prompt">请输入常用的邮箱地址</span>
+				<strong class="input-warnning">请输入正确的邮箱地址！</strong>
+				<i class="input-success">success</i>
+			</p>
+			<p>
+				<label for="password"></label>
+				<input type="password" name="password">
+			</p>
+			<p>
+				<button type="submit">登录</button>
+			</p>
+		</fieldset>
+	</form>
 	<script>
+	/*
 	var Assert = Model.create();
 	Assert.attributes = ['name', 'ext'];
 
@@ -18,6 +65,111 @@
 	
 	Assert.saveLocal('assert');
 	console.log(localStorage['assert']);
+	*/
+	/*
+	jQuery(function  () {
+		var ToggleView = Controller.create({
+			init: function  (view) {
+				this.view = $(view);
+				this.view.on('click', true, this.proxy(this.toggleClass));
+			},
+			toggleClass: function  (e) {
+				this.view.toggleClass('over', e.data ^ true);
+			}
+		});
+
+		new ToggleView('#view')
+	});
+	*/
+	/*
+	var SearchView = Controller.create({
+		elements: {
+			'input[type=search]': 'searchInput'
+		},
+		init: function  (element) {
+			this.el = $(element);
+			this.refreshElements();
+			this.el.submit(this.proxy(this.search));
+		},
+		search: function  () {
+			alert(this.searchInput.val());
+			return false;
+		},
+		$: function  (selector) {
+			return $(selector, this.el);
+		},
+		refreshElements: function  () {
+			for (var key in this.elements) {
+				this[this.elements[key]] = this.$(key);
+			}
+		}
+	});
+
+	new SearchView('#form')
+	*/
+
+	var LoginView = Controller.create({
+		elements: {
+			'input[name=email]': 'email',
+			'input[name=password]': 'password'
+		},
+		init: function  (element) {
+			this.el = $(element);
+			this.refreshElements();
+			this.showPrompts();
+			this.showWarnning();
+			this.el.submit(this.proxy(this.submit));
+		},
+		submit: function  () {
+			console.log('submit');
+			return false;
+		},
+		$: function  (selector) {
+			return $(selector, this.el);
+		},
+		refreshElements: function  () {
+			for(var key in this.elements) {
+				this[this.elements[key]] = this.$(key);
+			}
+		},
+		focus: function  () {
+			var $this = $(this),
+				$par = $this.parent(),
+				$info = $par.find('.input-prompt, .input-warnning, .input-success'),
+				$prompt = $par.find('span.input-prompt');
+			$info.hide();
+			$prompt.show();
+		},
+		blur: function  () {
+			var $this = $(this),
+				$par = $this.parent(),
+				$info = $par.find('.input-prompt, .input-warnning, .input-success'),
+				$warnning = $info.eq(1),
+				$success = $info.eq(2),
+				val = $.trim($this.val());
+			if('' === val) {
+				$info.hide();
+				$warnning.show();
+			}  else {
+				$info.hide();
+				$success.show();
+			}
+
+		},
+		showPrompts: function  () {
+			for(var key in this.elements) {
+				this[this.elements[key]].focus(this.focus);
+			}
+		},
+		showWarnning: function  () {
+			for(var key in this.elements) {
+				this[this.elements[key]].blur(this.blur);
+			}
+		}
+	});
+
+	new LoginView('#login');
+
 	</script>
 </body>
 </html>

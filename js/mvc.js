@@ -3,7 +3,7 @@
  * @date 2014-12-14
  * @author jason
  */
- (function (w) {
+ (function ($, w) {
  	/******************************** Model Start ***********************************/
  	if(typeof Object.create !== 'function') {
  		Object.creat = function  (o) {
@@ -59,14 +59,14 @@
  		},
  		extend: function (o) {
  			var extended = o.extended;
- 			jQuery.extend(this, o);
+ 			$.extend(this, o);
  			if(extended) {
  				extended(this);
  			}
  		},
  		include: function  (o) {
  			var included = o.included;
- 			jQuery.extend(this.prototype, o);
+ 			$.extend(this.prototype, o);
  			if(included) {
  				included(this);
  			}
@@ -92,7 +92,7 @@
  			this.parent.records.length--;
  		},
  		dup: function () {
- 			return jQuery.extend(true, {}, this);
+ 			return $.extend(true, {}, this);
  		},
  		attributes: function  () {
  			// 返回的指定的attributes
@@ -170,4 +170,39 @@
 
  	w.Model = Model;
  	/******************************** Model End ***********************************/
- }(window))
+ 	
+ 	var mod = {};
+
+ 	mod.create = function (includes) {
+ 		var result = function () {
+ 			this.init.apply(this, arguments);
+ 		};
+
+ 		result.fn = result.prototype;
+
+ 		result.fn.init = function  () {};
+
+ 		result.proxy = function (func) {
+ 			return $.proxy(func, this);
+ 		};
+
+ 		result.fn.proxy = result.proxy;
+
+ 		result.include = function  (obj) {
+ 			$.extend(this.fn, obj);
+ 		};
+
+ 		result.extend = function  (obj) {
+ 			$.extend(this, obj);
+ 		}
+
+ 		if(includes) {
+ 			result.include(includes);
+ 		}
+
+ 		return result;
+ 	}
+
+ 	w.Controller = mod;
+
+ }(jQuery, window))
