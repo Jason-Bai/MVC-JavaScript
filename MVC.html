@@ -27,11 +27,12 @@
 	<div id="view">
 		This is a demo!
 	</div>
+	-->
 	<form id="form" action="#" method="POST">
 		<input type="search" placeholder='搜索'>
 		<button type="submit">搜索</button>
 	</form>
-	-->
+	<!--
 	<form id="login" action="#" method="POST">
 		<fieldset>
 			<legend>
@@ -53,6 +54,7 @@
 			</p>
 		</fieldset>
 	</form>
+	-->
 	<script>
 	/*
 	var Assert = Model.create();
@@ -81,14 +83,17 @@
 		new ToggleView('#view')
 	});
 	*/
-	/*
 	var SearchView = Controller.create({
 		elements: {
 			'input[type=search]': 'searchInput'
 		},
+		events: {
+			'submit form': 'search'
+		},
 		init: function  (element) {
 			this.el = $(element);
 			this.refreshElements();
+			this.delegateEvents();
 			this.el.submit(this.proxy(this.search));
 		},
 		search: function  () {
@@ -102,12 +107,26 @@
 			for (var key in this.elements) {
 				this[this.elements[key]] = this.$(key);
 			}
+		},
+		eventSpliter: /^(\w+)\s*(.*)$/,
+		delegateEvents: function  () {
+			for(var key in this.events) {
+				var methodName = this.events[key];
+				var method = this.proxy(this[methodName]);
+
+				var match = key.match(this.eventSpliter);
+				var eventName = match[1], selector = match[2];
+				if(selector === '') {
+					this.el.bind(eventName, method);
+				} else {
+					this.el.on(eventName, selector, method);
+				}
+			}
 		}
 	});
 
 	new SearchView('#form')
-	*/
-
+	/*
 	var LoginView = Controller.create({
 		elements: {
 			'input[name=email]': 'email',
@@ -169,7 +188,7 @@
 	});
 
 	new LoginView('#login');
-
+	*/
 	</script>
 </body>
 </html>
